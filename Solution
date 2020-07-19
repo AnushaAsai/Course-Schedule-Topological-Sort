@@ -1,0 +1,75 @@
+class Solution {
+    boolean[] visited;
+    boolean[] explored;
+    List<Integer>[] adj;
+    Stack<Integer> stack = new Stack<>();
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        
+        adj = new ArrayList[numCourses];
+        for(int i=0; i<numCourses;i++){
+            adj[i] = new ArrayList<>();
+        }
+        
+        for(int i=0; i<prerequisites.length; i++){
+            
+            adj[prerequisites[i][1]].add(prerequisites[i][0]);
+        }
+        
+        visited = new boolean[numCourses];
+        explored = new boolean[numCourses];
+        
+        for(int i=0; i<numCourses;i++){
+            if(!visited[i]){
+                if(isCyclic(i)){
+                    return new int[0];
+                }
+            }
+        }
+        
+        visited = new boolean[numCourses];
+        for(int i=0;i<numCourses;i++){
+            if(!visited[i]){
+                topologicalSort(i);
+            }
+            
+        }
+        
+        int [] res = new int[numCourses];
+        for(int i=0;i<numCourses;i++){
+            res[i]=stack.pop();
+        }
+        
+        return res;
+    }
+    
+    public void topologicalSort(int i){
+        
+        for(Integer j : adj[i]){
+            if(!visited[j]){
+                topologicalSort(j);
+            }
+        }
+        visited[i] = true;
+        stack.push(i);
+    }
+
+    public boolean isCyclic(int i){
+        visited[i] = true;
+        
+        for(Integer j : adj[i]){
+            if(!visited[j]){
+                if(isCyclic(j)){
+                    return true;
+                }
+                
+            }else{
+                if(!explored[j]){
+                    return true;
+                }
+            }
+            
+        }
+        explored[i] = true;
+        return false;
+    }
+}
